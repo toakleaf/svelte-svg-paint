@@ -2,9 +2,9 @@
   import PaintArea from "./PaintArea.svelte";
 </script>
 
-<style global lang="scss">
+<!-- <style global lang="scss">
   @import "./styles.scss";
-</style>
+</style> -->
 
 <main class="container">
   <div class="columns is-centered">
