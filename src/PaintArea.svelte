@@ -2,7 +2,14 @@
   let points = [];
   let dragging = false;
 
-  $: console.log(points);
+  $: console.log(line);
+
+  $: line = points
+    .map((p, i) => {
+      if (i === 0) return `M${p.x} ${p.y} `;
+      else return `L${p.x} ${p.y} `;
+    })
+    .join(" ");
 
   const mousePos = event => {
     const bounds = event.target.getBoundingClientRect();
@@ -23,10 +30,13 @@
   };
 </script>
 
-<style>
+<style lang="scss">
   svg {
     background: black;
     min-height: 500px;
+    path {
+      stroke: white;
+    }
   }
 </style>
 
@@ -37,4 +47,8 @@
   on:mousedown={mouseDown}
   on:mousemove={drag}
   on:mouseup={mouseUp}
-  on:mouseleave={mouseUp} />
+  on:mouseleave={mouseUp}>
+  <path d={line} />
+</svg>
+
+<p>{line}</p>
