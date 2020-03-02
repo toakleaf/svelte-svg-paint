@@ -1,6 +1,9 @@
 <script>
   let svgElement;
   let line = null;
+  let quadratic = null;
+  let qPos = 0;
+  let qTemp = null;
   let dragging = false;
 
   const mousePos = event => {
@@ -10,13 +13,17 @@
   const mouseDown = event => {
     dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-    line = `M ${pt.x} ${pt.y}`;
+    line = `M ${pt.x} ${pt.y} `;
+    quadratic = line;
   };
 
   const drag = event => {
     if (dragging) {
       const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-      line += `L ${pt.x} ${pt.y}`;
+      line += `L ${pt.x} ${pt.y} `;
+      if (qPos % 2) quadratic += `${qTemp} ${pt.x} ${pt.y} `;
+      else qTemp = `Q${pt.x} ${pt.y} `;
+      qPos += 1;
     }
   };
 
@@ -58,5 +65,5 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  <path d={line} />
+  <path d={quadratic} />
 </svg>
