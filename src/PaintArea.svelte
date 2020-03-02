@@ -1,5 +1,6 @@
 <script>
   let svgElement;
+  let points = [];
   let line = null;
   let quadratic = null;
   let qPos = 0;
@@ -13,6 +14,7 @@
   const mouseDown = event => {
     dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
+    points = [pt];
     line = `M ${pt.x} ${pt.y} `;
     quadratic = line;
   };
@@ -20,6 +22,7 @@
   const drag = event => {
     if (dragging) {
       const pt = screenToSVG(svgElement, event.clientX, event.clientY);
+      points = [...points, pt];
       line += `L ${pt.x} ${pt.y} `;
       if (qPos % 2) quadratic += `${qTemp} ${pt.x} ${pt.y} `;
       else qTemp = `Q${pt.x} ${pt.y} `;
