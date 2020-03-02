@@ -1,16 +1,7 @@
 <script>
   let svgElement;
-  let points = [];
+  let line = null;
   let dragging = false;
-
-  $: console.log(line);
-
-  $: line = points
-    .map((p, i) => {
-      if (i === 0) return `M${p.x} ${p.y} `;
-      else return `L${p.x} ${p.y} `;
-    })
-    .join(" ");
 
   const mousePos = event => {
     return screenToSVG(svgElement, event.clientX, event.clientY);
@@ -18,11 +9,15 @@
 
   const mouseDown = event => {
     dragging = true;
-    points = [mousePos(event)];
+    const pt = screenToSVG(svgElement, event.clientX, event.clientY);
+    line = `M ${pt.x} ${pt.y}`;
   };
 
   const drag = event => {
-    if (dragging) points = [...points, mousePos(event)];
+    if (dragging) {
+      const pt = screenToSVG(svgElement, event.clientX, event.clientY);
+      line += `L ${pt.x} ${pt.y}`;
+    }
   };
 
   const mouseUp = event => {
@@ -65,5 +60,3 @@
   on:mouseleave={mouseUp}>
   <path d={line} />
 </svg>
-
-<p>{line}</p>
