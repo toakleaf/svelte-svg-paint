@@ -1,4 +1,5 @@
 <script>
+  let svgElement;
   let points = [];
   let dragging = false;
 
@@ -12,8 +13,7 @@
     .join(" ");
 
   const mousePos = event => {
-    const bounds = event.target.getBoundingClientRect();
-    return { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    return screenToSVG(svgElement, event.clientX, event.clientY);
   };
 
   const mouseDown = event => {
@@ -28,6 +28,20 @@
   const mouseUp = event => {
     dragging = false;
   };
+
+  function screenToSVG(svg, screenX, screenY) {
+    let p = svg.createSVGPoint();
+    p.x = screenX;
+    p.y = screenY;
+    return p.matrixTransform(svg.getScreenCTM().inverse());
+  }
+
+  function SVGToScreen(svg, svgX, svgY) {
+    let p = svg.createSVGPoint();
+    p.x = svgX;
+    p.y = svgY;
+    return p.matrixTransform(svg.getScreenCTM());
+  }
 </script>
 
 <style lang="scss">
@@ -42,6 +56,7 @@
 
 <p>Dragging? {dragging}</p>
 <svg
+  bind:this={svgElement}
   height="100%"
   width="100%"
   on:mousedown={mouseDown}
