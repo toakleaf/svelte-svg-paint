@@ -6,6 +6,32 @@
   let ptSkip = 2;
   let commandType = () => lineCommand;
 
+  // array of anchor point arrays (so we can point at data references)
+  let paths = [[{ x: 0, y: 0 }]];
+
+  // array of elements that have reference to raw data, settings, and resulting element
+  let elements = [
+    {
+      raw = paths[0]
+      anchorDensity: 0,
+      smoothing: 0,
+      offsets: { x: 0, y: 0 },
+      scaling: { x: 0, y: 0 },
+      zIndex: 0
+      rotation: 0,
+      lineWeight: 1,
+      color: "#fff",
+      boundingBox: [
+        {x: 0, y: 0},
+        {x: 1, y: 0},
+        {x: 1, y: 1},
+        {x: 0, y: 1},
+      ],
+      parentSize: {width: 100, height: 100},
+      element: '<path />'
+    }
+  ];
+
   $: path = svgPath(points.filter((p, i) => i % ptSkip === 0), commandType);
 
   const nearestThousandth = num =>
@@ -75,20 +101,20 @@
     return { x, y };
   };
 
-  const cubicBezierCommand = (point, i, a) => {
-    const start = controlPoint(a[i - 1], a[i - 2], point);
-    const end = controlPoint(point, a[i - 1], a[i + 1], true);
-    return `C ${start.x} ${start.y} ${end.x} ${end.y} ${point.x} ${point.y}`;
+  const cubicBezierCommand = (pt, i, a) => {
+    const start = controlPoint(a[i - 1], a[i - 2], pt, false);
+    const end = controlPoint(pt, a[i - 1], a[i + 1], true);
+    return `C ${start.x},${start.y} ${end.x},${end.y} ${pt.x},${pt.y}`;
   };
 
-  const lineCommand = point => `L ${point.x} ${point.y}`;
+  const lineCommand = pt => `L ${pt.x},${pt.y}`;
 
   const svgPath = (points, command) => {
     return points.reduce(
-      (acc, point, i, arr) =>
+      (acc, pt, i, arr) =>
         i === 0
-          ? `M ${point.x} ${point.y}`
-          : `${acc} ${command(point, i, arr)}`,
+          ? `M ${pt.x},${pt.y}`
+          : `${acc} ${command(pt, i, arr)}`,
       ""
     );
   };
