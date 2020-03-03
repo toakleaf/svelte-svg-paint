@@ -9,13 +9,13 @@
   // array of anchor point arrays (so we can point at data references)
   let paths = [[{ x: 0, y: 0 }]];
 
-  // array of elements that have reference to raw data, settings, and resulting element
+  // array of element objects that have reference to raw data, settings, and resulting element
   let elements = [
     {
       raw = paths[0]
       anchorDensity: 0,
       smoothing: 0,
-      referencePoint: {x: 0, y: 0} //point from which everything will be translated
+      referencePoint: {x: 0, y: 0} // point from which everything will be translated
       offsets: { x: 0, y: 0 },
       scaling: { x: 0, y: 0 },
       zIndex: 0
@@ -29,6 +29,7 @@
         {x: 0, y: 1},
       ],
       parentSize: {width: 100, height: 100},
+      points: [{x: 0, y: 0}] // array of points in resulting element
       element: '<path />'
     }
   ];
