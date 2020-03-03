@@ -15,6 +15,7 @@
       raw = paths[0]
       anchorDensity: 0,
       smoothing: 0,
+      referencePoint: {x: 0, y: 0} //point from which everything will be translated
       offsets: { x: 0, y: 0 },
       scaling: { x: 0, y: 0 },
       zIndex: 0
