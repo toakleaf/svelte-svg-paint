@@ -1,12 +1,20 @@
 <script>
   let svgElement;
+  let pathElement = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
   let points = [];
   let dragging = false;
   let smoothing = 0.2;
-  let ptSkip = 2;
+  let prune = 2;
   let commandType = () => lineCommand;
 
-  $: path = svgPath(points.filter((p, i) => i % ptSkip === 0), commandType);
+  const getTotalLength = pathToWatch => pathElement.getTotalLength();
+  $: totalPathLength = getTotalLength(path);
+  $: path = svgPath(points.filter((p, i) => i % prune === 0), commandType);
+
+  $: pathElement.setAttribute("d", path);
 
   const nearestThousandth = num =>
     Math.round((num + Number.EPSILON) * 1000) / 1000;
@@ -16,7 +24,7 @@
   };
 
   const mouseDown = event => {
-    ptSkip = 2;
+    prune = 2;
     commandType = lineCommand;
     dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
@@ -32,7 +40,7 @@
 
   const mouseUp = event => {
     dragging = false;
-    ptSkip = 10;
+    prune = Math.round(totalPathLength / 100);
     commandType = cubicBezierCommand;
   };
 
@@ -104,6 +112,7 @@
 
 <p>Dragging? {dragging}</p>
 <svg
+  xmlns="http://www.w3.org/2000/svg"
   bind:this={svgElement}
   height="100%"
   width="100%"
@@ -111,7 +120,10 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  <path d={path} />
+  <path bind:this={pathElement} />
 </svg>
 
 <p>{path}</p>
+<p>{totalPathLength}</p>
+<p>{totalPathLength / 10}</p>
+<p>{prune}</p>
