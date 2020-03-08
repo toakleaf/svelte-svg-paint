@@ -73,8 +73,4 @@
   };
 </script>
 
-<path
-  bind:this={pathElement}
-  stroke={color}
-  stroke-bind:clientWidth={strokeWidth}
-  {fill} />
+<path bind:this={pathElement} stroke={color} {fill} />

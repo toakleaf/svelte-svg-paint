@@ -4,7 +4,7 @@
 
   let svgElement;
   let elements = [];
-  let newElement = {};
+  let newElement = null;
 
   const mouseDown = event => {
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
@@ -17,7 +17,7 @@
   };
 
   const drag = event => {
-    if (newElement.dragging) {
+    if (newElement && newElement.dragging) {
       const pt = screenToSVG(svgElement, event.clientX, event.clientY);
       newElement = {
         ...newElement,
@@ -27,13 +27,18 @@
   };
 
   const mouseUp = event => {
-    elements.push({
-      ...newElement,
-      smoothing: 0.15,
-      simplification: 1,
-      dragging: false
-    });
-    newElement = {};
+    if (newElement) {
+      elements = [
+        ...elements,
+        {
+          ...newElement,
+          smoothing: 0.15,
+          simplification: 1,
+          dragging: false
+        }
+      ];
+      newElement = null;
+    }
   };
 </script>
 
@@ -53,11 +58,17 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  {#each [...elements, newElement] as element}
+  {#each elements as element}
     <Path
       pointsArray={element.raw}
       smoothing={element.smoothing}
       simplification={element.simplification} />
   {/each}
+  {#if newElement}
+    <Path
+      pointsArray={newElement.raw}
+      smoothing={newElement.smoothing}
+      simplification={newElement.simplification} />
+  {/if}
 
 </svg>
