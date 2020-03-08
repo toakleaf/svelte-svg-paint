@@ -1,4 +1,6 @@
 <script>
+  import RDP from "./scripts/LineSimplification";
+
   let svgElement;
   let pathElement = document.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -6,13 +8,13 @@
   );
   let points = [];
   let dragging = false;
-  let smoothing = 0.2;
-  let prune = 2;
+  let curviness = 0.2;
+  let smoothness = 5;
   let commandType = () => lineCommand;
 
   const getTotalLength = pathToWatch => pathElement.getTotalLength();
   $: totalPathLength = getTotalLength(path);
-  $: path = svgPath(points.filter((p, i) => i % prune === 0), commandType);
+  $: path = svgPath(points, commandType);
 
   $: pathElement.setAttribute("d", path);
 
@@ -24,7 +26,6 @@
   };
 
   const mouseDown = event => {
-    prune = 2;
     commandType = lineCommand;
     dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
@@ -39,8 +40,8 @@
   };
 
   const mouseUp = event => {
+    points = RDP(points, smoothness * 100);
     dragging = false;
-    prune = Math.round(totalPathLength / 100);
     commandType = cubicBezierCommand;
   };
 
@@ -76,7 +77,7 @@
     const opposedLine = line(p, n);
     // If is end-control-point, add PI to the angle to go backward
     const angle = opposedLine.angle + (reverse ? Math.PI : 0);
-    const length = opposedLine.length * smoothing;
+    const length = opposedLine.length * curviness;
     // The control point position is relative to the current point
     const x = nearestThousandth(current.x + Math.cos(angle) * length);
     const y = nearestThousandth(current.y + Math.sin(angle) * length);
@@ -124,6 +125,3 @@
 </svg>
 
 <p>{path}</p>
-<p>{totalPathLength}</p>
-<p>{totalPathLength / 10}</p>
-<p>{prune}</p>
