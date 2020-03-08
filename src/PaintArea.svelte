@@ -8,12 +8,15 @@
   );
   let points = [];
   let dragging = false;
-  let curviness = 0.2;
+  let curviness = 0.15;
   let smoothness = 5;
   let commandType = () => lineCommand;
 
   const getTotalLength = pathToWatch => pathElement.getTotalLength();
+  const getBBox = pathToWatch => pathElement.getBBox();
+
   $: totalPathLength = getTotalLength(path);
+  $: boundingBox = getBBox(path);
   $: path = svgPath(points, commandType);
 
   $: pathElement.setAttribute("d", path);
@@ -40,7 +43,7 @@
   };
 
   const mouseUp = event => {
-    points = RDP(points, smoothness * 100);
+    points = RDP(points, Math.max(boundingBox.width, boundingBox.height));
     dragging = false;
     commandType = cubicBezierCommand;
   };
@@ -111,7 +114,6 @@
   }
 </style>
 
-<p>Dragging? {dragging}</p>
 <svg
   xmlns="http://www.w3.org/2000/svg"
   bind:this={svgElement}
@@ -125,3 +127,4 @@
 </svg>
 
 <p>{path}</p>
+<p>{boundingBox.width}</p>
