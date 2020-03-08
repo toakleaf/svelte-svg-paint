@@ -5,15 +5,16 @@
   let svgElement;
   let pointsArray = [];
   let dragging = false;
-  let curving = 0;
-  let simplification = 1;
+  let smoothing = 0;
+  let simplification = 0;
 
   const mousePos = event => {
     return screenToSVG(svgElement, event.clientX, event.clientY);
   };
 
   const mouseDown = event => {
-    curving = 0;
+    smoothing = 0;
+    simplification = 0;
     dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
     pointsArray = [pt];
@@ -27,7 +28,8 @@
   };
 
   const mouseUp = event => {
-    curving = 0.15;
+    smoothing = 0.15;
+    simplification = 1;
     dragging = false;
   };
 </script>
@@ -48,6 +50,6 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  <Path {pointsArray} {curving} {simplification} />
+  <Path {pointsArray} {smoothing} {simplification} />
 
 </svg>
