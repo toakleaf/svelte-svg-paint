@@ -2,6 +2,7 @@
 
 // l = point obj array: [{x: number, y: number}]
 export const RDP = (l, eps) => {
+  if (!l.length) return [];
   const last = l.length - 1;
   const p1 = l[0];
   const p2 = l[last];
