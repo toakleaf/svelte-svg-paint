@@ -6,33 +6,53 @@
   let ptSkip = 2;
   let commandType = () => lineCommand;
 
+  import Anchor from "./Models/Anchor.js";
+  let = new Anchor(0, 0);
+
+  $: vector = anchor1.x;
+
+  // let state = {
+  //   visibleElements: [elements[0]], // array of pointers to elements array objects
+  //   selectedTool: 0,
+  //   toolTypes: {
+  //     0: "DIRECT_SELECTION",
+  //     1: "SELECTION",
+  //     2: "PENCIL",
+  //     3: "LINE_SEGMENT",
+  //     4: "ERASER",
+  //     5: "PAN", // use viewbox preserveAspectRatio="xMidYMid slice" x=offset y=offset on main SVG
+  //     6: "ZOOM" // use viewbox preserveAspectRatio="xMidYMid slice"
+  //   }
+  // };
+
   // array of anchor point arrays (so we can point at data references)
   let paths = [[{ x: 0, y: 0 }]];
 
-  // array of element objects that have reference to raw data, settings, and resulting element
-  let elements = [
-    {
-      raw = paths[0]
-      anchorDensity: 0,
-      smoothing: 0,
-      referencePoint: {x: 0, y: 0} // point from which everything will be translated
-      offsets: { x: 0, y: 0 },
-      scaling: { x: 0, y: 0 },
-      zIndex: 0
-      rotation: 0,
-      lineWeight: 1,
-      color: "#fff",
-      boundingBox: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 1, y: 1},
-        {x: 0, y: 1},
-      ],
-      parentSize: {width: 100, height: 100},
-      points: [{x: 0, y: 0}] // array of points in resulting element
-      element: '<path />'
-    }
-  ];
+  // array of element objects that have pointer to raw data, settings, and resulting element
+  // zIndex determined by placement in array
+  // let elements = [
+  //   {
+  //     raw: paths[0],
+  //     anchorDensity: 0,
+  //     smoothing: 0,
+  //     referencePoint: { x: 0, y: 0 }, // point from which everything will be translated
+  //     offsets: { x: 0, y: 0 },
+  //     scaling: { x: 0, y: 0 },
+  //     rotation: 0,
+  //     lineWeight: 1,
+  //     color: "#fff",
+  //     boundingBox: [
+  //       { x: 0, y: 0 },
+  //       { x: 1, y: 0 },
+  //       { x: 1, y: 1 },
+  //       { x: 0, y: 1 }
+  //     ],
+  //     parentSize: { width: 100, height: 100 },
+  //     anchorPoints: [{ x: 0, y: 0 }], // array of points in resulting element
+  //     handles: [{ x: 0, y: 0, anchor: anchorPoints[0] }], // handles contain pointer to anchor
+  //     element: "<path />"
+  //   }
+  // ];
 
   $: path = svgPath(points.filter((p, i) => i % ptSkip === 0), commandType);
 
@@ -114,9 +134,7 @@
   const svgPath = (points, command) => {
     return points.reduce(
       (acc, pt, i, arr) =>
-        i === 0
-          ? `M ${pt.x},${pt.y}`
-          : `${acc} ${command(pt, i, arr)}`,
+        i === 0 ? `M ${pt.x},${pt.y}` : `${acc} ${command(pt, i, arr)}`,
       ""
     );
   };
@@ -145,3 +163,7 @@
 </svg>
 
 <p>{path}</p>
+
+<p>{vector}</p>
+<button onclick={(anchor1.x = 2)}>do it</button>
+<p>{anchor1.x} {anchor1.y}</p>
