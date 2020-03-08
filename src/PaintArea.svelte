@@ -9,6 +9,9 @@
   const mouseDown = event => {
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
     newElement = {
+      id: `path-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
       raw: [pt],
       smoothing: 0,
       simplification: 0,
@@ -58,17 +61,20 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  {#each elements as element}
+  {#each elements as element (element.id)}
     <Path
       pointsArray={element.raw}
       smoothing={element.smoothing}
-      simplification={element.simplification} />
+      simplification={element.simplification}
+      id={element.id} />
   {/each}
   {#if newElement}
     <Path
       pointsArray={newElement.raw}
       smoothing={newElement.smoothing}
-      simplification={newElement.simplification} />
+      simplification={newElement.simplification}
+      id={newElement.id} />
   {/if}
-
 </svg>
+
+<p>{newElement}</p>

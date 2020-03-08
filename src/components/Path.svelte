@@ -7,6 +7,7 @@
   export let color = "white";
   export let strokeWidth = "1";
   export let fill = "none";
+  export let id = null;
 
   let pathElement = document.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -73,4 +74,9 @@
   };
 </script>
 
-<path bind:this={pathElement} stroke={color} {fill} />
+<path
+  bind:this={pathElement}
+  stroke={color}
+  {fill}
+  stroke-bind:clientWidth={strokeWidth}
+  {id} />
