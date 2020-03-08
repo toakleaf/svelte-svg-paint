@@ -6,34 +6,6 @@
   let ptSkip = 2;
   let commandType = () => lineCommand;
 
-  // array of anchor point arrays (so we can point at data references)
-  let paths = [[{ x: 0, y: 0 }]];
-
-  // array of element objects that have reference to raw data, settings, and resulting element
-  let elements = [
-    {
-      raw = paths[0]
-      anchorDensity: 0,
-      smoothing: 0,
-      referencePoint: {x: 0, y: 0} // point from which everything will be translated
-      offsets: { x: 0, y: 0 },
-      scaling: { x: 0, y: 0 },
-      zIndex: 0
-      rotation: 0,
-      lineWeight: 1,
-      color: "#fff",
-      boundingBox: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 1, y: 1},
-        {x: 0, y: 1},
-      ],
-      parentSize: {width: 100, height: 100},
-      points: [{x: 0, y: 0}] // array of points in resulting element
-      element: '<path />'
-    }
-  ];
-
   $: path = svgPath(points.filter((p, i) => i % ptSkip === 0), commandType);
 
   const nearestThousandth = num =>
@@ -114,9 +86,7 @@
   const svgPath = (points, command) => {
     return points.reduce(
       (acc, pt, i, arr) =>
-        i === 0
-          ? `M ${pt.x},${pt.y}`
-          : `${acc} ${command(pt, i, arr)}`,
+        i === 0 ? `M ${pt.x},${pt.y}` : `${acc} ${command(pt, i, arr)}`,
       ""
     );
   };
