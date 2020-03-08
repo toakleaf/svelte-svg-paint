@@ -9,7 +9,7 @@
   let points = [];
   let dragging = false;
   let curviness = 0.15;
-  let smoothness = 5;
+  let smoothness = 1;
   let commandType = () => lineCommand;
 
   const getTotalLength = pathToWatch => pathElement.getTotalLength();
@@ -43,7 +43,10 @@
   };
 
   const mouseUp = event => {
-    points = RDP(points, Math.max(boundingBox.width, boundingBox.height));
+    points = RDP(
+      points,
+      Math.max(boundingBox.width, boundingBox.height) * smoothness
+    );
     dragging = false;
     commandType = cubicBezierCommand;
   };
