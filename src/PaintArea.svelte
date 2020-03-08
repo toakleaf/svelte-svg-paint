@@ -3,34 +3,37 @@
   import Path from "./components/Path.svelte";
 
   let svgElement;
-  let pointsArray = [];
-  let dragging = false;
-  let smoothing = 0;
-  let simplification = 0;
-
-  const mousePos = event => {
-    return screenToSVG(svgElement, event.clientX, event.clientY);
-  };
+  let elements = [];
+  let newElement = {};
 
   const mouseDown = event => {
-    smoothing = 0;
-    simplification = 0;
-    dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-    pointsArray = [pt];
+    newElement = {
+      raw: [pt],
+      smoothing: 0,
+      simplification: 0,
+      dragging: true
+    };
   };
 
   const drag = event => {
-    if (dragging) {
+    if (newElement.dragging) {
       const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-      pointsArray = [...pointsArray, pt];
+      newElement = {
+        ...newElement,
+        raw: [...newElement.raw, pt]
+      };
     }
   };
 
   const mouseUp = event => {
-    smoothing = 0.15;
-    simplification = 1;
-    dragging = false;
+    elements.push({
+      ...newElement,
+      smoothing: 0.15,
+      simplification: 1,
+      dragging: false
+    });
+    newElement = {};
   };
 </script>
 
@@ -50,6 +53,11 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  <Path {pointsArray} {smoothing} {simplification} />
+  {#each [...elements, newElement] as element}
+    <Path
+      pointsArray={element.raw}
+      smoothing={element.smoothing}
+      simplification={element.simplification} />
+  {/each}
 
 </svg>
