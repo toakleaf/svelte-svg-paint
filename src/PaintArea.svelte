@@ -80,6 +80,9 @@
   {/if}
 </svg>
 
+{#if newElement}
+  <p>new: {newElement.id} {newElement.ref}</p>
+{/if}
 {#each elements as element}
-  <p>{element.id} {element.ref}</p>
+  <p>arr: {element.id} {element.ref}</p>
 {/each}
