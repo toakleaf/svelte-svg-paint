@@ -9,16 +9,12 @@
   export let fill = "none";
   export let id = null;
 
-  let pathElement = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "path"
-  );
+  let pathElement;
 
   const getTotalLength = watch => pathElement.getTotalLength();
   const getBBox = watch => pathElement.getBBox();
   $: totalPathLength = getTotalLength(path);
   $: boundingBox = getBBox(pointsArray);
-  $: console.log(id, simplification);
 
   $: path = svgPath(
     RDP(
@@ -27,7 +23,6 @@
     ),
     smoothing ? cubicBezierCommand : lineCommand
   );
-  $: pathElement.setAttribute("d", path);
 
   const line = (ptA, ptB) => {
     const lengthX = ptB.x - ptA.x;
@@ -76,6 +71,8 @@
 </script>
 
 <path
+  xmlns="http://www.w3.org/2000/svg"
+  d={path}
   bind:this={pathElement}
   stroke={color}
   {fill}
