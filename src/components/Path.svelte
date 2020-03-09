@@ -18,6 +18,7 @@
   const getBBox = watch => pathElement.getBBox();
   $: totalPathLength = getTotalLength(path);
   $: boundingBox = getBBox(pointsArray);
+  $: console.log(id, simplification);
 
   $: path = svgPath(
     RDP(
