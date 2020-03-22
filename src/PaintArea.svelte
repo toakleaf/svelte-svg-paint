@@ -4,6 +4,8 @@
   import { getPointFromEvent } from "./scripts/helpers";
 
   export let width = 200;
+  let zoom = 5;
+  $: zoomLevels = [3, 2, 1.5, 1.25, 1.11, 1, 0.91, 0.75, 0.6, 0.5, 0.333];
   let svgElement;
   let elements = [];
   let viewBoxX = 0;
@@ -78,13 +80,27 @@
   </label>
 {/each}
 
+<button
+  on:click={() => {
+    if (zoom > 0) zoom--;
+  }}>
+  –
+</button>
+{Math.round((1 / zoomLevels[zoom]) * 100)}%
+<button
+  on:click={() => {
+    if (zoom < zoomLevels.length - 1) zoom++;
+  }}>
+  +
+</button>
+
 <svg
   xmlns="http://www.w3.org/2000/svg"
   bind:this={svgElement}
   height={width / 2}
   {width}
-  viewBox={`${viewBoxX} ${viewBoxY} ${width} ${width / 2}`}
-  preserveAspectRatio="xMidYMin slice"
+  viewBox={`${viewBoxX} ${viewBoxY} ${width * zoomLevels[zoom]} ${(width * zoomLevels[zoom]) / 2}`}
+  preserveAspectRatio="xMinYMin slice"
   class:pan={selected === 'pan'}
   on:mousedown|preventDefault={mouseDown}
   on:touchstart|preventDefault={mouseDown}
@@ -109,3 +125,4 @@
       color="red" />
   {/if}
 </svg>
+<p>{zoom}</p>
