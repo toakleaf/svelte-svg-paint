@@ -6,7 +6,6 @@
   export let smoothing = 0.15;
   export let color = "white";
   export let strokeWidth = "1";
-  export let fill = "none";
   export let id = null;
 
   let pathElement = document.createElementNS(
@@ -69,10 +68,20 @@
   };
 </script>
 
+<style>
+  path {
+    pointer-events: visibleFill;
+  }
+</style>
+
 <path
   d={path}
   bind:this={pathElement}
   stroke={color}
-  {fill}
   stroke-bind:clientWidth={strokeWidth}
-  {id} />
+  {id}
+  fill="none"
+  on:mouseenter
+  on:mouseleave
+  on:click
+  pointer-events="visible" />

@@ -12,7 +12,7 @@
   let viewBoxY = 0;
   let newElement = null;
   let selected = "draw";
-  let options = ["draw", "pan"];
+  let options = ["draw", "select", "pan"];
   let dragOrigin = null;
 
   const mouseDown = event => {
@@ -25,7 +25,8 @@
           .substr(2, 9)}`,
         raw: [pt],
         smoothing: 0,
-        simplification: 0
+        simplification: 0,
+        color: "white"
       };
     }
     if (selected === "pan") {
@@ -69,7 +70,10 @@
     background: black;
   }
   .pan {
-    cursor: grab;
+    cursor: all-scroll;
+  }
+  .draw {
+    cursor: crosshair;
   }
 </style>
 
@@ -102,6 +106,7 @@
   viewBox={`${viewBoxX} ${viewBoxY} ${width * zoomLevels[zoom]} ${(width * zoomLevels[zoom]) / 2}`}
   preserveAspectRatio="xMinYMin slice"
   class:pan={selected === 'pan'}
+  class:draw={selected === 'draw'}
   on:mousedown|preventDefault={mouseDown}
   on:touchstart|preventDefault={mouseDown}
   on:mousemove|preventDefault={drag}
@@ -114,7 +119,9 @@
       pointsArray={element.raw}
       smoothing={element.smoothing}
       simplification={element.simplification}
-      id={element.id} />
+      id={element.id}
+      on:mouseenter={() => console.log('howdy')}
+      color={element.color} />
   {/each}
   {#if newElement}
     <Path
