@@ -3,6 +3,7 @@
   import Path from "./components/Path.svelte";
   import { getPointFromEvent } from "./scripts/helpers";
 
+  export let width = 200;
   let svgElement;
   let elements = [];
   let viewBoxX = 0;
@@ -64,7 +65,6 @@
 <style lang="scss">
   svg {
     background: black;
-    min-height: 500px;
   }
   .pan {
     cursor: grab;
@@ -81,9 +81,9 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   bind:this={svgElement}
-  height="100%"
-  width="100%"
-  viewBox={`${viewBoxX} ${viewBoxY} 100 100`}
+  height={width / 2}
+  {width}
+  viewBox={`${viewBoxX} ${viewBoxY} ${width} ${width / 2}`}
   preserveAspectRatio="xMidYMin slice"
   class:pan={selected === 'pan'}
   on:mousedown|preventDefault={mouseDown}
@@ -109,6 +109,3 @@
       color="red" />
   {/if}
 </svg>
-{#if svgElement}
-  <p>{console.log(svgElement.viewBox)}</p>
-{/if}
