@@ -9,10 +9,7 @@
   export let fill = "none";
   export let id = null;
 
-  let pathElement = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "path"
-  );
+  let pathElement;
 
   $: path = svgPathString(
     RDP(
@@ -70,6 +67,8 @@
 </script>
 
 <path
+  xmlns="http://www.w3.org/2000/svg"
+  d={path}
   bind:this={pathElement}
   stroke={color}
   {fill}
