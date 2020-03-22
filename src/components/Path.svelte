@@ -73,5 +73,4 @@
   stroke={color}
   {fill}
   stroke-bind:clientWidth={strokeWidth}
-  {id}
-  d={path} />
+  {id} />
