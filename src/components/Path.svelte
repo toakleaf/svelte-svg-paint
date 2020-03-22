@@ -41,7 +41,7 @@
     // 'previous' or 'next' don't exist. Replace with 'current'
     const p = previous || current;
     const n = next || current;
-    // Properties of the opposed-line
+    // Properties of the opposed-line.
     const opposedLine = line(p, n);
     // If is end-control-point, add PI to the angle to go backward
     const angle = opposedLine.angle + (reverse ? Math.PI : 0);
