@@ -8,23 +8,18 @@
 
   const mouseDown = event => {
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-    if (newElement) {
-      elements = [...elements, newElement];
-    }
     newElement = {
       id: `path-${Math.random()
         .toString(36)
         .substr(2, 9)}`,
       raw: [pt],
       smoothing: 0,
-      simplification: 0,
-      dragging: true,
-      ref: null
+      simplification: 0
     };
   };
 
   const drag = event => {
-    if (newElement && newElement.dragging) {
+    if (newElement) {
       const pt = screenToSVG(svgElement, event.clientX, event.clientY);
       newElement = {
         ...newElement,
@@ -35,12 +30,15 @@
 
   const mouseUp = event => {
     if (newElement) {
-      newElement = {
-        ...newElement,
-        smoothing: 0.15,
-        simplification: 1,
-        dragging: false
-      };
+      elements = [
+        ...elements,
+        {
+          ...newElement,
+          smoothing: 0.15,
+          simplification: 1
+        }
+      ];
+      newElement = null;
     }
   };
 </script>
@@ -63,7 +61,6 @@
   on:mouseleave={mouseUp}>
   {#each elements as element (element.id)}
     <Path
-      bind:this={element.ref}
       pointsArray={element.raw}
       smoothing={element.smoothing}
       simplification={element.simplification}
@@ -71,7 +68,6 @@
   {/each}
   {#if newElement}
     <Path
-      bind:this={newElement.ref}
       pointsArray={newElement.raw}
       smoothing={newElement.smoothing}
       simplification={newElement.simplification}
@@ -79,10 +75,3 @@
       color="red" />
   {/if}
 </svg>
-
-{#if newElement}
-  <p>new: {newElement.id} {newElement.ref}</p>
-{/if}
-{#each elements as element}
-  <p>arr: {element.id} {element.ref}</p>
-{/each}
