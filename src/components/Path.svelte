@@ -14,20 +14,14 @@
     "path"
   );
 
-  const getTotalLength = watch => pathElement.getTotalLength();
-  const getBBox = watch => pathElement.getBBox();
-  $: totalPathLength = getTotalLength(path);
-  $: boundingBox = getBBox(pointsArray);
-  $: console.log(id, simplification);
-
-  $: path = svgPath(
+  $: path = svgPathString(
     RDP(
       pointsArray,
-      Math.max(boundingBox.width, boundingBox.height) * simplification
+      Math.max(pathElement.getBBox().width, pathElement.getBBox().height) *
+        simplification
     ),
     smoothing ? cubicBezierCommand : lineCommand
   );
-  $: pathElement.setAttribute("d", path);
 
   const line = (ptA, ptB) => {
     const lengthX = ptB.x - ptA.x;
@@ -66,7 +60,7 @@
 
   const lineCommand = pt => `L ${pt.x},${pt.y}`;
 
-  const svgPath = (ptArr, command) => {
+  const svgPathString = (ptArr, command) => {
     return ptArr.reduce(
       (acc, pt, i, arr) =>
         i === 0 ? `M ${pt.x},${pt.y}` : `${acc} ${command(pt, i, arr)}`,
@@ -76,6 +70,7 @@
 </script>
 
 <path
+  d={path}
   bind:this={pathElement}
   stroke={color}
   {fill}
