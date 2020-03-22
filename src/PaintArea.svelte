@@ -125,4 +125,3 @@
       color="red" />
   {/if}
 </svg>
-<p>{zoom}</p>
