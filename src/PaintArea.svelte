@@ -1,142 +1,45 @@
 <script>
+  import { screenToSVG } from "./scripts/SVGTransforms";
+  import Path from "./components/Path.svelte";
+
   let svgElement;
-  let points = [];
-  let dragging = false;
-  let smoothing = 0.2;
-  let ptSkip = 2;
-  let commandType = () => lineCommand;
-
-  import Anchor from "./Models/Anchor.js";
-  let = new Anchor(0, 0);
-
-  $: vector = anchor1.x;
-
-  // let state = {
-  //   visibleElements: [elements[0]], // array of pointers to elements array objects
-  //   selectedTool: 0,
-  //   toolTypes: {
-  //     0: "DIRECT_SELECTION",
-  //     1: "SELECTION",
-  //     2: "PENCIL",
-  //     3: "LINE_SEGMENT",
-  //     4: "ERASER",
-  //     5: "PAN", // use viewbox preserveAspectRatio="xMidYMid slice" x=offset y=offset on main SVG
-  //     6: "ZOOM" // use viewbox preserveAspectRatio="xMidYMid slice"
-  //   }
-  // };
-
-  // array of anchor point arrays (so we can point at data references)
-  let paths = [[{ x: 0, y: 0 }]];
-
-  // array of element objects that have pointer to raw data, settings, and resulting element
-  // zIndex determined by placement in array
-  // let elements = [
-  //   {
-  //     raw: paths[0],
-  //     anchorDensity: 0,
-  //     smoothing: 0,
-  //     referencePoint: { x: 0, y: 0 }, // point from which everything will be translated
-  //     offsets: { x: 0, y: 0 },
-  //     scaling: { x: 0, y: 0 },
-  //     rotation: 0,
-  //     lineWeight: 1,
-  //     color: "#fff",
-  //     boundingBox: [
-  //       { x: 0, y: 0 },
-  //       { x: 1, y: 0 },
-  //       { x: 1, y: 1 },
-  //       { x: 0, y: 1 }
-  //     ],
-  //     parentSize: { width: 100, height: 100 },
-  //     anchorPoints: [{ x: 0, y: 0 }], // array of points in resulting element
-  //     handles: [{ x: 0, y: 0, anchor: anchorPoints[0] }], // handles contain pointer to anchor
-  //     element: "<path />"
-  //   }
-  // ];
-
-  $: path = svgPath(points.filter((p, i) => i % ptSkip === 0), commandType);
-
-  const nearestThousandth = num =>
-    Math.round((num + Number.EPSILON) * 1000) / 1000;
-
-  const mousePos = event => {
-    return screenToSVG(svgElement, event.clientX, event.clientY);
-  };
+  let elements = [];
+  let newElement = null;
 
   const mouseDown = event => {
-    ptSkip = 2;
-    commandType = lineCommand;
-    dragging = true;
     const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-    points = [pt];
+    newElement = {
+      id: `path-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
+      raw: [pt],
+      smoothing: 0,
+      simplification: 0
+    };
   };
 
   const drag = event => {
-    if (dragging) {
+    if (newElement) {
       const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-      points = [...points, pt];
+      newElement = {
+        ...newElement,
+        raw: [...newElement.raw, pt]
+      };
     }
   };
 
   const mouseUp = event => {
-    dragging = false;
-    ptSkip = 10;
-    commandType = cubicBezierCommand;
-  };
-
-  function screenToSVG(svg, screenX, screenY) {
-    let pt = svg.createSVGPoint();
-    pt.x = screenX;
-    pt.y = screenY;
-    return pt.matrixTransform(svg.getScreenCTM().inverse());
-  }
-
-  function SVGToScreen(svg, svgX, svgY) {
-    let pt = svg.createSVGPoint();
-    pt.x = svgX;
-    pt.y = svgY;
-    return pt.matrixTransform(svg.getScreenCTM());
-  }
-
-  const line = (ptA, ptB) => {
-    const lengthX = ptB.x - ptA.x;
-    const lengthY = ptB.y - ptA.y;
-    return {
-      length: Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)),
-      angle: Math.atan2(lengthY, lengthX)
-    };
-  };
-
-  const controlPoint = (current, previous, next, reverse) => {
-    // When 'current' is the first or last point of the array
-    // 'previous' or 'next' don't exist. Replace with 'current'
-    const p = previous || current;
-    const n = next || current;
-    // Properties of the opposed-line
-    const opposedLine = line(p, n);
-    // If is end-control-point, add PI to the angle to go backward
-    const angle = opposedLine.angle + (reverse ? Math.PI : 0);
-    const length = opposedLine.length * smoothing;
-    // The control point position is relative to the current point
-    const x = nearestThousandth(current.x + Math.cos(angle) * length);
-    const y = nearestThousandth(current.y + Math.sin(angle) * length);
-    return { x, y };
-  };
-
-  const cubicBezierCommand = (pt, i, a) => {
-    const start = controlPoint(a[i - 1], a[i - 2], pt, false);
-    const end = controlPoint(pt, a[i - 1], a[i + 1], true);
-    return `C ${start.x},${start.y} ${end.x},${end.y} ${pt.x},${pt.y}`;
-  };
-
-  const lineCommand = pt => `L ${pt.x},${pt.y}`;
-
-  const svgPath = (points, command) => {
-    return points.reduce(
-      (acc, pt, i, arr) =>
-        i === 0 ? `M ${pt.x},${pt.y}` : `${acc} ${command(pt, i, arr)}`,
-      ""
-    );
+    if (newElement) {
+      elements = [
+        ...elements,
+        {
+          ...newElement,
+          smoothing: 0.15,
+          simplification: 1
+        }
+      ];
+      newElement = null;
+    }
   };
 </script>
 
@@ -144,14 +47,11 @@
   svg {
     background: black;
     min-height: 500px;
-    path {
-      stroke: white;
-    }
   }
 </style>
 
-<p>Dragging? {dragging}</p>
 <svg
+  xmlns="http://www.w3.org/2000/svg"
   bind:this={svgElement}
   height="100%"
   width="100%"
@@ -159,11 +59,19 @@
   on:mousemove={drag}
   on:mouseup={mouseUp}
   on:mouseleave={mouseUp}>
-  <path d={path} />
+  {#each elements as element (element.id)}
+    <Path
+      pointsArray={element.raw}
+      smoothing={element.smoothing}
+      simplification={element.simplification}
+      id={element.id} />
+  {/each}
+  {#if newElement}
+    <Path
+      pointsArray={newElement.raw}
+      smoothing={newElement.smoothing}
+      simplification={newElement.simplification}
+      id={newElement.id}
+      color="red" />
+  {/if}
 </svg>
-
-<p>{path}</p>
-
-<p>{vector}</p>
-<button onclick={(anchor1.x = 2)}>do it</button>
-<p>{anchor1.x} {anchor1.y}</p>
