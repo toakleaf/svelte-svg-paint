@@ -1,30 +1,46 @@
 <script>
   import { screenToSVG } from "./scripts/SVGTransforms";
   import Path from "./components/Path.svelte";
+  import { getPointFromEvent } from "./scripts/helpers";
 
   let svgElement;
   let elements = [];
+  let viewBoxX = 0;
+  let viewBoxY = 0;
   let newElement = null;
+  let selected = "draw";
+  let options = ["draw", "pan"];
+  let dragOrigin = null;
 
   const mouseDown = event => {
-    const pt = screenToSVG(svgElement, event.clientX, event.clientY);
-    newElement = {
-      id: `path-${Math.random()
-        .toString(36)
-        .substr(2, 9)}`,
-      raw: [pt],
-      smoothing: 0,
-      simplification: 0
-    };
+    const screenPt = getPointFromEvent(event);
+    const pt = screenToSVG(svgElement, screenPt.x, screenPt.y);
+    if (selected === "draw") {
+      newElement = {
+        id: `path-${Math.random()
+          .toString(36)
+          .substr(2, 9)}`,
+        raw: [pt],
+        smoothing: 0,
+        simplification: 0
+      };
+    }
+    if (selected === "pan") {
+      dragOrigin = pt;
+    }
   };
 
   const drag = event => {
+    const screenPt = getPointFromEvent(event);
+    const pt = screenToSVG(svgElement, screenPt.x, screenPt.y);
     if (newElement) {
-      const pt = screenToSVG(svgElement, event.clientX, event.clientY);
       newElement = {
         ...newElement,
         raw: [...newElement.raw, pt]
       };
+    } else if (dragOrigin) {
+      viewBoxX = viewBoxX - (pt.x - dragOrigin.x);
+      viewBoxY = viewBoxY - (pt.y - dragOrigin.y);
     }
   };
 
@@ -39,6 +55,8 @@
         }
       ];
       newElement = null;
+    } else if (dragOrigin) {
+      dragOrigin = null;
     }
   };
 </script>
@@ -48,17 +66,33 @@
     background: black;
     min-height: 500px;
   }
+  .pan {
+    cursor: grab;
+  }
 </style>
+
+{#each options as value}
+  <label>
+    <input type="radio" {value} bind:group={selected} />
+    {value}
+  </label>
+{/each}
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
   bind:this={svgElement}
   height="100%"
   width="100%"
-  on:mousedown={mouseDown}
-  on:mousemove={drag}
-  on:mouseup={mouseUp}
-  on:mouseleave={mouseUp}>
+  viewBox={`${viewBoxX} ${viewBoxY} 100 100`}
+  preserveAspectRatio="xMidYMin slice"
+  class:pan={selected === 'pan'}
+  on:mousedown|preventDefault={mouseDown}
+  on:touchstart|preventDefault={mouseDown}
+  on:mousemove|preventDefault={drag}
+  on:tounchmove|preventDefault={drag}
+  on:mouseup|preventDefault={mouseUp}
+  on:mouseleave|preventDefault={mouseUp}
+  on:touchend|preventDefault={mouseUp}>
   {#each elements as element (element.id)}
     <Path
       pointsArray={element.raw}
@@ -75,3 +109,6 @@
       color="red" />
   {/if}
 </svg>
+{#if svgElement}
+  <p>{console.log(svgElement.viewBox)}</p>
+{/if}
