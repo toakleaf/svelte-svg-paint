@@ -5,19 +5,16 @@
   export let simplification = 1.0;
   export let smoothing = 0.15;
   export let color = "white";
-  export let strokeWidth = "1";
+  export let strokeWidth = 1;
+  export let pointerEvents = "visibleStroke";
   export let id = null;
 
-  let pathElement = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "path"
-  );
+  let ref = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
   $: path = svgPathString(
     RDP(
       pointsArray,
-      Math.max(pathElement.getBBox().width, pathElement.getBBox().height) *
-        simplification
+      Math.max(ref.getBBox().width, ref.getBBox().height) * simplification
     ),
     smoothing ? cubicBezierCommand : lineCommand
   );
@@ -68,20 +65,14 @@
   };
 </script>
 
-<style>
-  path {
-    pointer-events: visibleFill;
-  }
-</style>
-
 <path
   d={path}
-  bind:this={pathElement}
+  bind:this={ref}
   stroke={color}
-  stroke-bind:clientWidth={strokeWidth}
+  stroke-width={`${strokeWidth}`}
   {id}
   fill="none"
+  style={{ 'pointer-events': pointerEvents }}
   on:mouseenter
   on:mouseleave
-  on:click
-  pointer-events="visible" />
+  on:click />

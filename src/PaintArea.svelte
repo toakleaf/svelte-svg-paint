@@ -11,14 +11,14 @@
   let viewBoxX = 0;
   let viewBoxY = 0;
   let newElement = null;
-  let selected = "draw";
-  let options = ["draw", "select", "pan"];
+  let tool = "draw";
+  let toolOptions = ["draw", "select", "pan"];
   let dragOrigin = null;
 
   const mouseDown = event => {
     const screenPt = getPointFromEvent(event);
     const pt = screenToSVG(svgElement, screenPt.x, screenPt.y);
-    if (selected === "draw") {
+    if (tool === "draw") {
       newElement = {
         id: `path-${Math.random()
           .toString(36)
@@ -26,10 +26,12 @@
         raw: [pt],
         smoothing: 0,
         simplification: 0,
-        color: "white"
+        color: "white",
+        strokeWidth: 1,
+        pointerEvents: "visibleStroke"
       };
     }
-    if (selected === "pan") {
+    if (tool === "pan") {
       dragOrigin = pt;
     }
   };
@@ -77,9 +79,9 @@
   }
 </style>
 
-{#each options as value}
+{#each toolOptions as value}
   <label>
-    <input type="radio" {value} bind:group={selected} />
+    <input type="radio" {value} bind:group={tool} />
     {value}
   </label>
 {/each}
@@ -105,8 +107,8 @@
   {width}
   viewBox={`${viewBoxX} ${viewBoxY} ${width * zoomLevels[zoom]} ${(width * zoomLevels[zoom]) / 2}`}
   preserveAspectRatio="xMinYMin slice"
-  class:pan={selected === 'pan'}
-  class:draw={selected === 'draw'}
+  class:pan={tool === 'pan'}
+  class:draw={tool === 'draw'}
   on:mousedown|preventDefault={mouseDown}
   on:touchstart|preventDefault={mouseDown}
   on:mousemove|preventDefault={drag}
@@ -114,13 +116,20 @@
   on:mouseup|preventDefault={mouseUp}
   on:mouseleave|preventDefault={mouseUp}
   on:touchend|preventDefault={mouseUp}>
-  {#each elements as element (element.id)}
+  {#each elements as element, i (element.id)}
     <Path
       pointsArray={element.raw}
       smoothing={element.smoothing}
       simplification={element.simplification}
       id={element.id}
-      on:mouseenter={() => console.log('howdy')}
+      on:mouseenter={() => {
+        if (tool === 'select') elements[i] = { ...element, strokeWidth: element.strokeWidth * 3, color: 'pink' };
+      }}
+      on:mouseleave={() => {
+        if (tool === 'select') elements[i] = { ...element, strokeWidth: parseInt(element.strokeWidth / 3), color: 'white' };
+      }}
+      on:click={() => {}}
+      strokeWidth={element.strokeWidth}
       color={element.color} />
   {/each}
   {#if newElement}
